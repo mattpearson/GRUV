@@ -23,8 +23,10 @@ print ('Finished loading training data')
 freq_space_dims = X_train.shape[2]
 hidden_dims = config['hidden_dimension_size']
 
+print (X_train.shape)
+print (hidden_dims)
 #Creates a lstm network
-model = network_utils.create_lstm_network(num_frequency_dimensions=freq_space_dims, num_hidden_dimensions=hidden_dims)
+model = network_utils.create_lstm_network(num_frequency_dimensions=freq_space_dims, num_hidden_dimensions=hidden_dims, sz=( X_train.shape[1], X_train.shape[2]) )
 #You could also substitute this with a RNN or GRU
 #model = network_utils.create_gru_network()
 
@@ -32,9 +34,9 @@ model = network_utils.create_lstm_network(num_frequency_dimensions=freq_space_di
 if os.path.isfile(model_filename):
 	model.load_weights(model_filename)
 
-num_iters = 50 			#Number of iterations for training
-epochs_per_iter = 25	#Number of iterations before we save our model
-batch_size = 5			#Number of training examples pushed to the GPU per batch.
+num_iters = 2001 			#Number of iterations for training
+epochs_per_iter = 60	#Number of iterations before we save our model
+batch_size = 90			#Number of training examples pushed to the GPU per batch.
 						#Larger batch sizes require more memory, but training will be faster
 print ('Starting training!')
 while cur_iter < num_iters:
@@ -47,5 +49,5 @@ while cur_iter < num_iters:
 	#you've trained the model for some number of epochs
 	history = model.fit(X_train, y_train, batch_size=batch_size, nb_epoch=epochs_per_iter, verbose=1, validation_split=0.0)
 	cur_iter += epochs_per_iter
+	model.save_weights(model_basename + str(cur_iter))
 print ('Training complete!')
-model.save_weights(model_basename + str(cur_iter))

@@ -31,9 +31,10 @@ print ('Finished loading training data')
 #Figure out how many frequencies we have in the data
 freq_space_dims = X_train.shape[2]
 hidden_dims = config['hidden_dimension_size']
+print (X_train.shape)
 
 #Creates a lstm network
-model = network_utils.create_lstm_network(num_frequency_dimensions=freq_space_dims, num_hidden_dimensions=hidden_dims)
+model = network_utils.create_lstm_network(num_frequency_dimensions=freq_space_dims, num_hidden_dimensions=hidden_dims, sz=( X_train.shape[1], X_train.shape[2] ) )
 #You could also substitute this with a RNN or GRU
 #model = network_utils.create_gru_network()
 
@@ -54,9 +55,11 @@ print ('Starting generation!')
 seed_len = 1
 seed_seq = seed_generator.generate_copy_seed_sequence(seed_length=seed_len, training_data=X_train)
 
+print ('seed seq:')
+print (seed_seq.shape)
+
 max_seq_len = 10; #Defines how long the final song is. Total song length in samples = max_seq_len * example_len
-output = sequence_generator.generate_from_seed(model=model, seed=seed_seq, 
-	sequence_length=max_seq_len, data_variance=X_var, data_mean=X_mean)
+output = sequence_generator.generate_from_seed(model=model, seed=seed_seq, sequence_length=max_seq_len, data_variance=X_var, data_mean=X_mean)
 print ('Finished generation!')
 
 #Save the generated sequence to a WAV file

@@ -9,8 +9,18 @@ def generate_from_seed(model, seed, sequence_length, data_variance, data_mean):
 	#Step 1 - Given A = [X_0, X_1, ... X_n], generate X_n + 1
 	#Step 2 - Concatenate X_n + 1 onto A
 	#Step 3 - Repeat MAX_SEQ_LEN times
+
+	print (seedSeq.shape)
+
+	result = np.zeros( (1, seedSeq.shape[1]+0, seedSeq.shape[2] ) )
+	result[ 0, xrange(0,seedSeq.shape[1]+0), :] = seedSeq
+	seedSeqNew = model.predict(result) #Step 1. Generate X_n + 1
+		
+
 	for it in xrange(sequence_length):
-		seedSeqNew = model._predict(seedSeq) #Step 1. Generate X_n + 1
+		print ('it: ', it )
+		print (seedSeq.shape)
+		seedSeqNew = model.predict(seedSeq) #Step 1. Generate X_n + 1
 		#Step 2. Append it to the sequence
 		if it == 0:
 			for i in xrange(seedSeqNew.shape[1]):
@@ -19,7 +29,14 @@ def generate_from_seed(model, seed, sequence_length, data_variance, data_mean):
 			output.append(seedSeqNew[0][seedSeqNew.shape[1]-1].copy()) 
 		newSeq = seedSeqNew[0][seedSeqNew.shape[1]-1]
 		newSeq = np.reshape(newSeq, (1, 1, newSeq.shape[0]))
+		print (newSeq.shape)
 		seedSeq = np.concatenate((seedSeq, newSeq), axis=1)
+
+		result = np.zeros( (1, seedSeq.shape[1]-1, seedSeq.shape[2] ) )
+	        result[ 0, xrange(0,seedSeq.shape[1]-1), :] = seedSeq[ 0, xrange(1,seedSeq.shape[1]), : ]
+		seedSeq = result
+
+
 
 	#Finally, post-process the generated sequence so that we have valid frequencies
 	#We're essentially just undo-ing the data centering process
